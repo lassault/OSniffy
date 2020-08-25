@@ -144,3 +144,7 @@ static
 
 # PDF files
 *.pdf
+
+# Testing files
+*test*
+
