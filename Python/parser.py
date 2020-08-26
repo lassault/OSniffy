@@ -14,6 +14,18 @@ class Parser:
         ethernet.source = (':'.join(format(c, '02x') for c in bytes.fromhex(ethernet.source))).upper()
         ethernet.ethertype = hex(data[2])
 
+    def arp_header(self, frame, arp):
+        data = struct.unpack("!HHBBH6s4s6s4s", frame)
+        arp.hard_type = data[0]
+        arp.protocol = hex(data[1])
+        arp.opcode = data[4]
+        arp.hard_source = binascii.hexlify(data[5]).decode('utf-8')
+        arp.hard_source = (':'.join(format(c, '02x') for c in bytes.fromhex(arp.hard_source))).upper()
+        arp.proto_source = socket.inet_ntoa(data[6])
+        arp.hard_destination = binascii.hexlify(data[7]).decode('utf-8')
+        arp.hard_destination = (':'.join(format(c, '02x') for c in bytes.fromhex(arp.hard_destination))).upper()
+        arp.proto_destination = socket.inet_ntoa(data[8])
+
     def icmp_header(self, frame, icmp):
         data = struct.unpack("!BBH4s", frame)
         icmp.type = data[0]
