@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 
-import socket, struct, binascii, os, frames, parser
+import binascii
+import frames
+import mysql_db
+import os
+import parser
+import settings
+import socket
+import struct
 
 # Check if works with Windows machines
 
@@ -16,6 +23,8 @@ else:
     s=socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(0x0003))
 
 parser = parser.Parser()
+mysql = mysql_db.MySQL()
+mysql.main()
 
 # Difference between 'recv()' and 'recvfrom()'?
 # Buffer size, look at that
@@ -24,53 +33,51 @@ while True:
   data = s.recvfrom(1024)
   # data = s.recv(655565)
 
-  print("Layer 2:")
-  print("========")
+  packet = frames.Packet()
 
   ethernet = frames.Ethernet()
   parser.ethernet_header(data[0][0:14], ethernet)
-  ethernet.print()
+  packet.layer2 = ethernet
 
   if int(ethernet.ethertype, 16) == int('0x800', 16):
-    print("IPv4") 
-  
-    print()
-    print("Layer 3:")
-    print("========")
-
     ipv4 = frames.IPv4()
     parser.ipv4_header(data[0][14:34], ipv4)
-    ipv4.print()
-
-    print()
+    packet.layer3 = ipv4
 
     if ipv4.protocol == 1:
-      print("ICMP")
       icmp = frames.ICMP()
       parser.icmp_header(data[0][34:42], icmp)
-      icmp.print()
+      packet.layer4 = icmp
+      packet.label = "ICMP"
+
     elif ipv4.protocol == 6:
-      print("Layer 4:")
-      print("========")
-      print("TCP")
       tcp = frames.TCP()
       parser.tcp_header(data[0][34:54], tcp)
-      tcp.print()
+      packet.layer4 = tcp
+      packet.label = "TCP"
+
     elif ipv4.protocol == 17:
-      print("Layer 4:")
-      print("========")
-      print("UDP")
       udp = frames.UDP()
       parser.udp_header(data[0][34:42], udp)
-      udp.print()
+      packet.layer4 = udp
+      packet.label = "UDP"
+
     else:
-      print("Other:", ipv4.protocol)
+      print("Other protocol:", ipv4.protocol)
+      print()
       
   elif int(ethernet.ethertype, 16) == int('0x86dd', 16):
-    print("IPv6")
+    print("Name: IPv6")
+    print()
   elif int(ethernet.ethertype, 16) == int('0x806', 16):
-    print("ARP")
-  else:
-    print("Other:", ethernet.ethertype)
+    arp = frames.ARP()
+    parser.arp_header(data[0][14:42], arp)
+    packet.layer3 = arp
+    packet.label = "ARP"
 
-  print()
+  else:
+    print("Other ethertype:", ethernet.ethertype)
+    print()
+
+  #packet.print()
+  mysql.insert(packet)
