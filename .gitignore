@@ -148,3 +148,15 @@ static
 # Testing files
 *test*
 
+# Text files
+*.txt
+
+# Markdown files
+*.md
+
+
+# PCAP files
+*.pcap*
+
+# Config files
+.vscode/
