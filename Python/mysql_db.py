@@ -115,9 +115,14 @@ class MySQL:
 
         elif packet.label is "TCP":
 
-            # Filter all the oackets that insert in the DB
+            # Filter all the packets of inserting in MySQL
             if (packet.layer3.source == "127.0.0.1") and (packet.layer3.destination == "127.0.0.1"):
                 if (packet.layer4.source == 3306) or (packet.layer4.destination == 3306):
+                    return
+
+            # Filter all the packets of consulting to Grafana
+            if (packet.layer3.source == "127.0.0.1") and (packet.layer3.destination == "127.0.0.1"):
+                if (packet.layer4.source == 3000) or (packet.layer4.destination == 3000):
                     return
 
             query_tcp = """INSERT INTO {NAME}
@@ -158,7 +163,7 @@ class MySQL:
             self.pointer.execute(query_udp, params_udp)
 
         self.connection.commit()
-        #packet.print()
+        packet.print()
 
 
 
