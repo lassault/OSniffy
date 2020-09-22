@@ -4,6 +4,7 @@ class Packet:
         self.layer3 = None
         self.layer4 = None
         self.label = None
+        self.time = None
 
     def print(self):
         print("Packet:", self.label)

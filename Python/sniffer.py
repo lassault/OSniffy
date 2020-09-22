@@ -80,4 +80,4 @@ while True:
     print()
 
   #packet.print()
-  mysql.insert(packet)
+  mysql.insert_sniffer(packet)

@@ -79,7 +79,7 @@ class MySQL:
             """.format(NAME=self.TABLE_NAME)
         self.pointer.execute(query)
 
-    def insert(self, packet):
+    def insert_sniffer(self, packet):
         if packet.label is "ARP":
             query_arp = """INSERT INTO {NAME}
                 (srcMAC, dstMAC, etherType, srcIP, dstIP)
@@ -95,7 +95,7 @@ class MySQL:
                 )
 
             self.pointer.execute(query_arp, params_arp)
-
+        
         elif packet.label is "ICMP":
             query_icmp = """INSERT INTO {NAME}
                 (srcMAC, dstMAC, etherType, srcIP, dstIP, protocol)
@@ -114,7 +114,6 @@ class MySQL:
             self.pointer.execute(query_icmp, params_icmp)
 
         elif packet.label is "TCP":
-
             # Filter all the packets of inserting in MySQL
             if (packet.layer3.source == "127.0.0.1") and (packet.layer3.destination == "127.0.0.1"):
                 if (packet.layer4.source == 3306) or (packet.layer4.destination == 3306):
@@ -152,7 +151,7 @@ class MySQL:
             params_udp = (
                 packet.layer2.source,
                 packet.layer2.destination,
-                packet.layer2.ethertype,
+                packet.layer2.ethertype,   
                 packet.layer3.source,
                 packet.layer3.destination,
                 packet.layer3.protocol,
@@ -162,8 +161,260 @@ class MySQL:
 
             self.pointer.execute(query_udp, params_udp)
 
+        self.connection.commit()   
+        packet.print()         
+
+    def insert_reader(self, packets):
+        for packet in packets:
+            if packet.label is "ARP":
+                query_arp = """INSERT INTO {NAME}
+                    (srcMAC, dstMAC, etherType, srcIP, dstIP, timestamp)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """.format(NAME=self.TABLE_NAME)
+
+                params_arp = (
+                    packet.layer2.source,
+                    packet.layer2.destination,
+                    packet.layer2.ethertype,
+                    packet.layer3.proto_source,
+                    packet.layer3.proto_destination,
+                    packet.time
+                )
+
+                self.pointer.execute(query_arp, params_arp)
+            
+            elif packet.label is "ICMP":
+                query_icmp = """INSERT INTO {NAME}
+                (srcMAC, dstMAC, etherType, srcIP, dstIP, protocol, timestamp)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """.format(NAME=self.TABLE_NAME)
+
+                params_icmp = (
+                    packet.layer2.source,
+                    packet.layer2.destination,
+                    packet.layer2.ethertype,
+                    packet.layer3.source,
+                    packet.layer3.destination,
+                    packet.layer3.protocol,
+                    packet.time
+                )
+
+                self.pointer.execute(query_icmp, params_icmp)
+
+            elif packet.label is "TCP":
+                # Filter all the packets of inserting in MySQL
+                if (packet.layer3.source == "127.0.0.1") and (packet.layer3.destination == "127.0.0.1"):
+                    if (packet.layer4.source == 3306) or (packet.layer4.destination == 3306):
+                        return
+
+                # Filter all the packets of consulting to Grafana
+                if (packet.layer3.source == "127.0.0.1") and (packet.layer3.destination == "127.0.0.1"):
+                    if (packet.layer4.source == 3000) or (packet.layer4.destination == 3000):
+                        return
+
+                query_tcp = """INSERT INTO {NAME}
+                    (srcMAC, dstMAC, etherType, srcIP, dstIP, protocol, srcPort, dstPort, timestamp)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """.format(NAME=self.TABLE_NAME)
+
+                params_tcp = (
+                    packet.layer2.source,
+                    packet.layer2.destination,
+                    packet.layer2.ethertype,
+                    packet.layer3.source,
+                    packet.layer3.destination,
+                    packet.layer3.protocol,
+                    packet.layer4.source,
+                    packet.layer4.destination,
+                    packet.time
+                    )
+
+                self.pointer.execute(query_tcp, params_tcp)
+
+            elif packet.label is "UDP":
+                query_udp = """INSERT INTO {NAME}
+                (srcMAC, dstMAC, etherType, srcIP, dstIP, protocol, srcPort, dstPort, timestamp)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """.format(NAME=self.TABLE_NAME)
+
+                params_udp = (
+                    packet.layer2.source,
+                    packet.layer2.destination,
+                    packet.layer2.ethertype,
+                    packet.layer3.source,
+                    packet.layer3.destination,
+                    packet.layer3.protocol,
+                    packet.layer4.source,
+                    packet.layer4.destination,
+                    packet.time
+                    )
+
+                self.pointer.execute(query_udp, params_udp)
+
+        self.connection.commit() 
+        print("Inserted {} packets".format(len(packets)))  
+        #packet.print()
+
+    '''
+    def insert(self, packet):
+        if packet.label is "ARP":
+            if packet.time is None:
+                query_arp = """INSERT INTO {NAME}
+                    (srcMAC, dstMAC, etherType, srcIP, dstIP)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """.format(NAME=self.TABLE_NAME)
+
+                params_arp = (
+                    packet.layer2.source,
+                    packet.layer2.destination,
+                    packet.layer2.ethertype,
+                    packet.layer3.proto_source,
+                    packet.layer3.proto_destination
+                    )
+
+                self.pointer.execute(query_arp, params_arp)
+            else:
+                query_arp = """INSERT INTO {NAME}
+                    (srcMAC, dstMAC, etherType, srcIP, dstIP, timestamp)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """.format(NAME=self.TABLE_NAME)
+
+                params_arp = (
+                    packet.layer2.source,
+                    packet.layer2.destination,
+                    packet.layer2.ethertype,
+                    packet.layer3.proto_source,
+                    packet.layer3.proto_destination,
+                    packet.time
+                )
+
+                self.pointer.execute(query_arp, params_arp)
+
+        elif packet.label is "ICMP":
+            if packet.time is None:
+                query_icmp = """INSERT INTO {NAME}
+                    (srcMAC, dstMAC, etherType, srcIP, dstIP, protocol)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """.format(NAME=self.TABLE_NAME)
+
+                params_icmp = (
+                    packet.layer2.source,
+                    packet.layer2.destination,
+                    packet.layer2.ethertype,
+                    packet.layer3.source,
+                    packet.layer3.destination,
+                    packet.layer3.protocol
+                    )
+
+                self.pointer.execute(query_icmp, params_icmp)
+            else:
+                query_icmp = """INSERT INTO {NAME}
+                (srcMAC, dstMAC, etherType, srcIP, dstIP, protocol, timestamp)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """.format(NAME=self.TABLE_NAME)
+
+                params_icmp = (
+                    packet.layer2.source,
+                    packet.layer2.destination,
+                    packet.layer2.ethertype,
+                    packet.layer3.source,
+                    packet.layer3.destination,
+                    packet.layer3.protocol,
+                    packet.time
+                )
+
+                self.pointer.execute(query_icmp, params_icmp)
+
+        elif packet.label is "TCP":
+
+            # Filter all the packets of inserting in MySQL
+            if (packet.layer3.source == "127.0.0.1") and (packet.layer3.destination == "127.0.0.1"):
+                if (packet.layer4.source == 3306) or (packet.layer4.destination == 3306):
+                    return
+
+            # Filter all the packets of consulting to Grafana
+            if (packet.layer3.source == "127.0.0.1") and (packet.layer3.destination == "127.0.0.1"):
+                if (packet.layer4.source == 3000) or (packet.layer4.destination == 3000):
+                    return
+
+            if packet.time is None:
+                query_tcp = """INSERT INTO {NAME}
+                    (srcMAC, dstMAC, etherType, srcIP, dstIP, protocol, srcPort, dstPort)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    """.format(NAME=self.TABLE_NAME)
+
+                params_tcp = (
+                    packet.layer2.source,
+                    packet.layer2.destination,
+                    packet.layer2.ethertype,
+                    packet.layer3.source,
+                    packet.layer3.destination,
+                    packet.layer3.protocol,
+                    packet.layer4.source,
+                    packet.layer4.destination
+                    )
+
+                self.pointer.execute(query_tcp, params_tcp)
+            else:
+                query_tcp = """INSERT INTO {NAME}
+                    (srcMAC, dstMAC, etherType, srcIP, dstIP, protocol, srcPort, dstPort, timestamp)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """.format(NAME=self.TABLE_NAME)
+
+                params_tcp = (
+                    packet.layer2.source,
+                    packet.layer2.destination,
+                    packet.layer2.ethertype,
+                    packet.layer3.source,
+                    packet.layer3.destination,
+                    packet.layer3.protocol,
+                    packet.layer4.source,
+                    packet.layer4.destination,
+                    packet.time
+                    )
+
+                self.pointer.execute(query_tcp, params_tcp)
+
+        elif packet.label is "UDP":
+            if packet.time is None:
+                query_udp = """INSERT INTO {NAME}
+                    (srcMAC, dstMAC, etherType, srcIP, dstIP, protocol, srcPort, dstPort)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    """.format(NAME=self.TABLE_NAME)
+
+                params_udp = (
+                    packet.layer2.source,
+                    packet.layer2.destination,
+                    packet.layer2.ethertype,   
+                    packet.layer3.source,
+                    packet.layer3.destination,
+                    packet.layer3.protocol,
+                    packet.layer4.source,
+                    packet.layer4.destination
+                    )
+
+                self.pointer.execute(query_udp, params_udp)
+            else:
+                query_udp = """INSERT INTO {NAME}
+                (srcMAC, dstMAC, etherType, srcIP, dstIP, protocol, srcPort, dstPort, timestamp)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """.format(NAME=self.TABLE_NAME)
+
+                params_udp = (
+                    packet.layer2.source,
+                    packet.layer2.destination,
+                    packet.layer2.ethertype,
+                    packet.layer3.source,
+                    packet.layer3.destination,
+                    packet.layer3.protocol,
+                    packet.layer4.source,
+                    packet.layer4.destination,
+                    packet.time
+                    )
+
+                self.pointer.execute(query_udp, params_udp)
+
+
         self.connection.commit()
         packet.print()
-
-
-
+        '''
