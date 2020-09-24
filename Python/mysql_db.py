@@ -31,7 +31,7 @@ class MySQL:
             password = self.PASSWORD,
             database = self.DB_NAME
         )
-        self.pointer = self.connection.cursor()
+        self.pointer = self.connection.cursor(buffered=True)
 
         self.table_exists = self.check_table()
         if not self.table_exists:

@@ -1,25 +1,23 @@
 from pylibpcap.pcap import rpcap
 from datetime import datetime
 import parser, frames, mysql_db
+import time
 
 parser = parser.Parser()
 mysql = mysql_db.MySQL()
 mysql.main()
 
 def main():
-    '''parser = parser.Parser()
-    mysql = mysql_db.MySQL()
-    mysql.main()'''
 
     packets = []
+    total_counter = 0
     counter = 0
 
-    # Now, it inserts the packets in amounts of 1000
-    # Read the file name from the args
-    # Maintain the timestamp of the packat when reading from a *.pcap file (Done)
+    start = time.time()
 
-    #for lenght, timestamp, pkt in rpcap("lotsofweb.pcapng"):
-    for lenght, timestamp, pkt in rpcap("test.pcap"):
+    # Fix the counters
+
+    for lenght, timestamp, pkt in rpcap("lotsofweb.pcapng"):
 
         if counter == 1000:
             mysql.insert_reader(packets)
@@ -55,12 +53,14 @@ def main():
                 packet.label = "UDP"
 
             else:
-                print("Other protocol:", ipv4.protocol)
-                print()
+                pass
+                #print("Other protocol:", ipv4.protocol)
+                #print()
         
         elif int(ethernet.ethertype, 16) == int('0x86dd', 16):
-            print("Name: IPv6")
-            print()
+            pass
+            #print("Name: IPv6")
+            #print()
 
         elif int(ethernet.ethertype, 16) == int('0x806', 16):
             arp = frames.ARP()
@@ -69,14 +69,21 @@ def main():
             packet.label = "ARP"
 
         else:
-            print("Other ethertype:", ethernet.ethertype)
-            print()
+            pass
+            #print("Other ethertype:", ethernet.ethertype)
+            #print()
 
         #packet.print()
         packet.time = datetime.fromtimestamp(timestamp)
         packets.append(packet)
         counter += 1
+        total_counter += 1
         #mysql.insert(packet)
     mysql.insert_reader(packets)
+
+    end = time.time()
+    
+    print()
+    print("Inserted {PACKETS} in {TIME:.2f} seconds".format(PACKETS=total_counter, TIME=(end - start)))
 
 main()
