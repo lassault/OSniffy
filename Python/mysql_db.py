@@ -1,5 +1,6 @@
 import mysql.connector
 import settings
+import time
 
 class MySQL:
     def __init__(self):
@@ -202,16 +203,6 @@ class MySQL:
                 self.pointer.execute(query_icmp, params_icmp)
 
             elif packet.label is "TCP":
-                # Filter all the packets of inserting in MySQL
-                if (packet.layer3.source == "127.0.0.1") and (packet.layer3.destination == "127.0.0.1"):
-                    if (packet.layer4.source == 3306) or (packet.layer4.destination == 3306):
-                        return
-
-                # Filter all the packets of consulting to Grafana
-                if (packet.layer3.source == "127.0.0.1") and (packet.layer3.destination == "127.0.0.1"):
-                    if (packet.layer4.source == 3000) or (packet.layer4.destination == 3000):
-                        return
-
                 query_tcp = """INSERT INTO {NAME}
                     (srcMAC, dstMAC, etherType, srcIP, dstIP, protocol, srcPort, dstPort, timestamp)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)

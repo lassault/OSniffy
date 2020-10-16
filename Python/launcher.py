@@ -64,7 +64,13 @@ def main(start, end):
     print("Dashboard added to Grafana")
 
     if (settings.os.getenv("USER") == "root"):
-        args = ["runuser", "-u", "{USER}".format(USER=settings.USER), "sensible-browser", "http://localhost:3000/d/zyHdgQcMk/tfg?refresh=5s&from={START}&to={END}".format(START=start, END=end)]
+        if end == "now-5m":
+            args = ["runuser", "-u", "{USER}".format(USER=settings.USER), "sensible-browser", "http://localhost:3000/d/zyHdgQcMk/tfg?refresh=5s&from={START}&to={END}".format(START=start, END=end)]
+        else:
+            args = ["runuser", "-u", "{USER}".format(USER=settings.USER), "sensible-browser", "http://localhost:3000/d/zyHdgQcMk/tfg?from={START}&to={END}".format(START=start, END=end)]
         subprocess.Popen(args)
     else:
-        subprocess.run(["sensible-browser", "http://localhost:3000/d/zyHdgQcMk/tfg?refresh=5s&from={START}&to={END}".format(START=start, END=end)])
+        if end == "now-5m":
+            subprocess.run(["sensible-browser", "http://localhost:3000/d/zyHdgQcMk/tfg?refresh=5s&from={START}&to={END}".format(START=start, END=end)])
+        else:
+            subprocess.run(["sensible-browser", "http://localhost:3000/d/zyHdgQcMk/tfg?from={START}&to={END}".format(START=start, END=end)])

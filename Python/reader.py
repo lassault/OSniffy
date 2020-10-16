@@ -7,7 +7,7 @@ parser = parser.Parser()
 mysql = mysql_db.MySQL()
 mysql.main()
 
-def main():
+def main(file):
 
     packets = []
     total_counter = 0
@@ -17,10 +17,9 @@ def main():
 
     # Fix the counters
     # Re-create the table for each reader
-    #for lenght, timestamp, pkt in rpcap("../tvtraza1.pcapng"):
-    for lenght, timestamp, pkt in rpcap("../Data_v1/pcap_bulk-1/bulk_xs_07.pcap"):
+    for lenght, timestamp, pkt in rpcap(file):
 
-        if counter == 10000:
+        if counter == 100000:
             mysql.insert_reader(packets)
             counter = 0
             packets.clear()
@@ -88,6 +87,5 @@ def main():
     print("Inserted {PACKETS} in {TIME:.2f} seconds".format(PACKETS=total_counter, TIME=(end - start)))
     print()
 
-main()
-start, end = mysql.get_time_range()
-launcher.main(start, end)
+    start, end = mysql.get_time_range()
+    launcher.main(start, end)
