@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
+  "id": null,
   "links": [],
   "panels": [
     {
@@ -701,7 +701,7 @@
       "type": "bargauge"
     },
     {
-      "datasource": null,
+      "datasource": "OSniffy",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -737,7 +737,7 @@
         "x": 12,
         "y": 19
       },
-      "id": 15,
+      "id": 23,
       "options": {
         "displayMode": "gradient",
         "orientation": "horizontal",
@@ -755,7 +755,15 @@
       "targets": [
         {
           "format": "table",
-          "group": [],
+          "group": [
+            {
+              "params": [
+                "$__interval",
+                "none"
+              ],
+              "type": "time"
+            }
+          ],
           "metricColumn": "none",
           "rawQuery": true,
           "rawSql": "SELECT\n  dstIP,\n  count(dstIP)\nFROM Packets\nGROUP BY dstIP\nORDER BY count(dstIP) desc",
@@ -767,6 +775,18 @@
                   "packetID"
                 ],
                 "type": "column"
+              },
+              {
+                "params": [
+                  "count"
+                ],
+                "type": "aggregate"
+              },
+              {
+                "params": [
+                  "$__cell_0"
+                ],
+                "type": "alias"
               }
             ]
           ],
@@ -825,7 +845,7 @@
         "x": 0,
         "y": 27
       },
-      "id": 17,
+      "id": 24,
       "options": {
         "displayMode": "gradient",
         "orientation": "horizontal",
@@ -969,13 +989,13 @@
   ],
   "refresh": "5s",
   "schemaVersion": 26,
-  "style": "dark",
+  "style": "light",
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {
@@ -992,8 +1012,8 @@
       "1d"
     ]
   },
-  "timezone": "",
+  "timezone": "browser",
   "title": "TFG",
-  "uid": "Zo786DDMk",
-  "version": 4
+  "uid": "zyHdgQcMk",
+  "version": 7
 }

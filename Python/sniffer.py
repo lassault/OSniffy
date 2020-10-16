@@ -2,6 +2,7 @@
 
 import binascii
 import frames
+import launcher
 import mysql_db
 import os
 import parser
@@ -25,6 +26,8 @@ else:
 parser = parser.Parser()
 mysql = mysql_db.MySQL()
 mysql.main()
+
+launcher.main("now-5m", "now")
 
 # Difference between 'recv()' and 'recvfrom()'?
 # Buffer size, look at that

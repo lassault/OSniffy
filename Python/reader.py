@@ -1,6 +1,6 @@
 from pylibpcap.pcap import rpcap
 from datetime import datetime
-import parser, frames, mysql_db
+import parser, frames, mysql_db, launcher
 import time
 
 parser = parser.Parser()
@@ -16,10 +16,11 @@ def main():
     start = time.time()
 
     # Fix the counters
+    # Re-create the table for each reader
+    #for lenght, timestamp, pkt in rpcap("../tvtraza1.pcapng"):
+    for lenght, timestamp, pkt in rpcap("../Data_v1/pcap_bulk-1/bulk_xs_07.pcap"):
 
-    for lenght, timestamp, pkt in rpcap("lotsofweb.pcapng"):
-
-        if counter == 1000:
+        if counter == 10000:
             mysql.insert_reader(packets)
             counter = 0
             packets.clear()
@@ -85,5 +86,8 @@ def main():
     
     print()
     print("Inserted {PACKETS} in {TIME:.2f} seconds".format(PACKETS=total_counter, TIME=(end - start)))
+    print()
 
 main()
+start, end = mysql.get_time_range()
+launcher.main(start, end)

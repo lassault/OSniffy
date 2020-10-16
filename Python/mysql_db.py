@@ -3,7 +3,7 @@ import settings
 
 class MySQL:
     def __init__(self):
-        self.HOST = settings.HOST
+        self.HOST = settings.MYSQL_HOST
         self.USER = settings.MYSQL_USER
         self.PASSWORD = settings.MYSQL_PASS
         self.DB_NAME = settings.DB_NAME
@@ -67,9 +67,9 @@ class MySQL:
             etherType VARCHAR(6) NOT NULL,
             srcIP VARCHAR(15) NOT NULL,
             dstIP VARCHAR(15) NOT NULL,
-            protocol TINYINT UNSIGNED,
-            srcPort SMALLINT UNSIGNED,
-            dstPort SMALLINT UNSIGNED,
+            protocol TINYINT(1) UNSIGNED,
+            srcPort SMALLINT(2) UNSIGNED,
+            dstPort SMALLINT(2) UNSIGNED,
             timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY(packetID)
             )
@@ -254,6 +254,27 @@ class MySQL:
         self.connection.commit() 
         print("Inserted {} packets".format(len(packets)))  
         #packet.print()
+
+    def get_time_range(self):
+        query_start = """SELECT timestamp FROM {NAME}
+                    WHERE packetID = {ID}
+                    """.format(NAME=self.TABLE_NAME, ID=1)
+
+        self.pointer.execute(query_start)
+
+        start = self.pointer.fetchone()
+        start = int(start[0].timestamp()) * 1000
+
+        query_end = """SELECT timestamp FROM {NAME}
+                    WHERE packetID = (SELECT COUNT(*) FROM {NAME})
+                    """.format(NAME=self.TABLE_NAME)
+
+        self.pointer.execute(query_end)
+
+        end = self.pointer.fetchone()
+        end = int(end[0].timestamp()) * 1000
+
+        return start, end
 
     '''
     def insert(self, packet):
