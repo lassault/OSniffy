@@ -21,20 +21,20 @@ Sistema online de disección de protocolos en trazas de paquetes
 El escenario diseñado consiste en un servidor que contiene el código, el panel de Grafana y una base de datos MySQL. El cliente tiene dos opciones, subir una captura de tráfico o visualizar el tráfico en tiempo real.
 
 Los datos que se procesan de cada paquete son:
-    1. ID de paquete
-    2. MAC origen
-    3. MAC destino
-    4. Ethertype
-    5. IP origen
-    6. IP destino
-    7. Protocolo
-    8. Puerto origen
-    9. Puerto destino
-    10. Timestamp
+1. ID de paquete
+2. MAC origen
+3. MAC destino
+4. Ethertype
+5. IP origen
+6. IP destino
+7. Protocolo
+8. Puerto origen
+9. Puerto destino
+10. Timestamp
 
 En función del modo de uso, la manera de procesar los paquetes varia ligeramente:
-    - Tiempo real: Se procesa el paquete y se inserta en la base de datos uno a uno.
-    - Lectura de captura: Se procesan los paquetes y se insertan en bloques de 10.000.
+- Tiempo real: Se procesa el paquete y se inserta en la base de datos uno a uno.
+- Lectura de captura: Se procesan los paquetes y se insertan en bloques de 10.000.
 
 El prototipo diseñado consiste en dos modos de funcionamiento y utiliza un panel de Grafana para poder visualizar los datos de tráfico de red.
 
