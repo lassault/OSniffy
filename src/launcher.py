@@ -34,9 +34,6 @@ def main(start, end):
         'database': DB_NAME
     }
 
-
-    # The request adds the MySQL database as a data source of Grafana
-
     response = requests.post(url=url, headers=headers, data=json.dumps(body))
 
     if (response.status_code == 409):

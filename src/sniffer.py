@@ -27,11 +27,8 @@ mysql.main()
 def main():
   launcher.main("now-5m", "now")
 
-# Difference between 'recv()' and 'recvfrom()'?
-# Buffer size, look at that
   while True:
     data = s.recvfrom(1024)
-    # data = s.recv(655565)
 
     packet = frames.Packet()
 
@@ -79,5 +76,4 @@ def main():
       print("Other ethertype:", ethernet.ethertype)
       print()
 
-    #packet.print()
     mysql.insert_sniffer(packet)

@@ -1,0 +1,9 @@
+certifi==2025.4.26
+charset-normalizer==3.4.1
+Cython==3.0.12
+idna==3.10
+mysql-connector-python==9.3.0
+python-dotenv==1.1.0
+python-libpcap==0.5.2
+requests==2.32.3
+urllib3==2.4.0

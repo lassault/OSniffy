@@ -15,11 +15,9 @@ def main(file):
 
     start = time.time()
 
-    # Fix the counters
-    # Re-create the table for each reader
     for lenght, timestamp, pkt in rpcap(file):
 
-        if counter == 100000:
+        if counter == 10000:
             mysql.insert_reader(packets)
             counter = 0
             packets.clear()
@@ -73,12 +71,11 @@ def main(file):
             #print("Other ethertype:", ethernet.ethertype)
             #print()
 
-        #packet.print()
         packet.time = datetime.fromtimestamp(timestamp)
         packets.append(packet)
         counter += 1
         total_counter += 1
-        #mysql.insert(packet)
+
     mysql.insert_reader(packets)
 
     end = time.time()
