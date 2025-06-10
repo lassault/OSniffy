@@ -5,5 +5,5 @@ idna==3.10
 mysql-connector-python==9.3.0
 python-dotenv==1.1.0
 python-libpcap==0.5.2
-requests==2.32.3
+requests==2.32.4
 urllib3==2.4.0
