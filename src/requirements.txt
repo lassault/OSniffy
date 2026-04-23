@@ -3,7 +3,7 @@ charset-normalizer==3.4.1
 Cython==3.0.12
 idna==3.10
 mysql-connector-python==9.3.0
-python-dotenv==1.1.0
+python-dotenv==1.2.2
 python-libpcap==0.5.2
 requests==2.33.0
 urllib3==2.6.3
