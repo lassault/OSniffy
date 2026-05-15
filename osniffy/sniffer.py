@@ -23,7 +23,7 @@ def _create_raw_socket() -> socket.socket:
     """Return a raw socket appropriate for the current operating system."""
     if os.name == "nt":  # Windows
         s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_IP)
-        s.bind(("0.0.0.0", 0))
+        s.bind(("0.0.0.0", 0))  # noqa: S104 – intentional wildcard for raw capture
         s.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
         s.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)  # type: ignore[attr-defined]
     else:  # Linux / BSD

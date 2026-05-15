@@ -29,7 +29,7 @@ def _default_source(file: str) -> RawPacketSource:
     """Open a pcap file via pylibpcap (imported lazily to keep tests light)."""
     from pylibpcap.pcap import rpcap  # type: ignore[import]
 
-    return rpcap(file)
+    return rpcap(file)  # type: ignore[no-any-return]
 
 
 def run(

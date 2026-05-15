@@ -14,14 +14,14 @@ from __future__ import annotations
 
 import logging
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import mysql.connector
 from mysql.connector import MySQLConnection
 
 from ..config import Config
-from ..protocol.frames import ARP, ICMP, IPv4, TCP, UDP, Packet
+from ..protocol.frames import ARP, TCP, UDP, IPv4, Packet
 
 logger = logging.getLogger(__name__)
 
@@ -124,16 +124,12 @@ class MySQLRepository:
         cursor = self._conn.cursor()
         try:
             cursor.execute(
-                "CREATE DATABASE IF NOT EXISTS `{db}` "
-                "CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci".format(
-                    db=self._config.db_name
-                )
+                f"CREATE DATABASE IF NOT EXISTS `{self._config.db_name}` "
+                "CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
             )
             self._conn.commit()
             cursor.execute(f"USE `{self._config.db_name}`")
-            cursor.execute(
-                _CREATE_TABLE_SQL.format(table=self._config.table_name)
-            )
+            cursor.execute(_CREATE_TABLE_SQL.format(table=self._config.table_name))
             self._conn.commit()
         finally:
             cursor.close()
@@ -199,8 +195,7 @@ class MySQLRepository:
         cursor = self._conn.cursor()
         try:
             cursor.execute(
-                "SELECT MIN(`timestamp`), MAX(`timestamp`) "
-                "FROM `{table}`".format(table=self._config.table_name)
+                f"SELECT MIN(`timestamp`), MAX(`timestamp`) FROM `{self._config.table_name}`"  # noqa: S608 – table name is internal
             )
             row = cursor.fetchone()
         finally:
@@ -209,8 +204,12 @@ class MySQLRepository:
         if row is None or row[0] is None:
             raise ValueError("No packets found – cannot determine time range")
 
-        start_ms = int(row[0].timestamp()) * 1000
-        end_ms = int(row[1].timestamp()) * 1000
+        # mysql-connector returns datetime objects for DATETIME columns;
+        # mypy doesn't know this, so we assert the type explicitly.
+        ts_min: datetime = row[0]  # type: ignore[assignment]
+        ts_max: datetime = row[1]  # type: ignore[assignment]
+        start_ms = int(ts_min.timestamp()) * 1000
+        end_ms = int(ts_max.timestamp()) * 1000
         return start_ms, end_ms
 
     # ------------------------------------------------------------------
@@ -247,7 +246,7 @@ class MySQLRepository:
         l2 = packet.layer2
         l3 = packet.layer3
         l4 = packet.layer4
-        ts = packet.time if packet.time is not None else datetime.now(tz=timezone.utc)
+        ts = packet.time if packet.time is not None else datetime.now(tz=UTC)
 
         src_ip = dst_ip = ""
         protocol: int | None = None

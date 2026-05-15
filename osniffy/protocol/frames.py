@@ -7,7 +7,7 @@ without boilerplate.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 
 
@@ -86,5 +86,5 @@ class Packet:
     layer2: Ethernet | None = None
     layer3: IPv4 | ARP | None = None
     layer4: ICMP | TCP | UDP | None = None
-    label: str = ""          # "ARP" | "ICMP" | "TCP" | "UDP" | ""
+    label: str = ""  # "ARP" | "ICMP" | "TCP" | "UDP" | ""
     time: datetime | None = None

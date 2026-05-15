@@ -11,7 +11,7 @@ import binascii
 import socket as _socket
 import struct
 
-from .frames import ARP, ICMP, IPv4, TCP, UDP, Ethernet, Packet
+from .frames import ARP, ICMP, TCP, UDP, Ethernet, IPv4, Packet
 
 # Ethertype constants
 _ETH_IPV4 = 0x0800

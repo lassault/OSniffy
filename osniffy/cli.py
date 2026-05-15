@@ -124,8 +124,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.sniffer:
         if os.name != "nt" and os.getenv("USER") != "root":
             logger.error(
-                "Sniffer mode requires root privileges on Linux. "
-                "Try: sudo osniffy --sniffer"
+                "Sniffer mode requires root privileges on Linux. Try: sudo osniffy --sniffer"
             )
             return _EXIT_RUNTIME_ERROR
 

@@ -76,9 +76,7 @@ def load_config(env_file: str | None = None) -> Config:
     try:
         grafana_port = int(grafana_port_raw)
     except ValueError:
-        raise ConfigError(
-            f"GRAFANA_PORT must be an integer, got '{grafana_port_raw}'"
-        ) from None
+        raise ConfigError(f"GRAFANA_PORT must be an integer, got '{grafana_port_raw}'") from None
 
     return Config(
         mysql_host=mysql_host,
