@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: ["master", "main"]
 
+permissions:
+  contents: read
+
 # Cancel in-progress runs for the same branch so merged PRs don't waste runners.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -120,5 +123,10 @@ jobs:
       - name: Install pip-audit
         run: pip install pip-audit
 
+      - name: Install project dependencies
+        run: |
+          sudo apt-get install -y libpcap-dev
+          pip install -e .
+
       - name: Audit dependencies
-        run: pip-audit --requirement src/requirements.txt --skip-editable || true
+        run: pip-audit --progress-spinner=off

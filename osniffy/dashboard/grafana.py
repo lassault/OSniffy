@@ -27,10 +27,10 @@ from ..config import Config
 logger = logging.getLogger(__name__)
 
 # Path to the bundled dashboard JSON files shipped with the package.
-_DASHBOARD_DIR = Path(__file__).parent.parent.parent / "grafana" / "provisioning" / "dashboards"
+_DASHBOARD_DIR = Path(__file__).parent.parent.parent / "grafana" / "dashboards"
 
 # Dashboard UID used when opening the URL.  Matches the uid field in the JSON.
-_DASHBOARD_UID = "osniffy-reader"
+_DASHBOARD_UID = "zyHdgQcMk"
 
 
 def provision_datasource(cfg: Config) -> None:
