@@ -1,4 +1,4 @@
-certifi==2025.4.26
+certifi==2026.10.19
 charset-normalizer==3.4.1
 Cython==3.0.12
 idna==3.15
