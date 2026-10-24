@@ -1,0 +1,18 @@
+apiVersion: 1
+
+datasources:
+  - name: OSniffy
+    type: mysql
+    access: proxy
+    url: ${MYSQL_HOST}:3306
+    user: ${MYSQL_USER_GRAFANA}
+    secureJsonData:
+      password: ${MYSQL_PASS_GRAFANA}
+    database: ${DB_NAME}
+    isDefault: true
+    editable: false
+    jsonData:
+      maxOpenConns: 10
+      maxIdleConns: 2
+      connMaxLifetime: 14400
+      tlsAuth: false
